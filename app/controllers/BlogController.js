@@ -1,5 +1,6 @@
 const blogModel = require('../models/Blog');
 const readingTime = require('../../utils/readTime');
+const { matchedData } = require("express-validator");
 const BlogState = 'published';
 
 function create(req, res, next) {
@@ -34,7 +35,7 @@ async function fetchAllBlog(req, res, next) {
     const skip = (page - 1) * limit;
 
     if (req.query.state) search.state = req.query.state
-    search.id = req.body.auth.user._id
+    search.author = req.body.auth.user._id
 
     try {
 
@@ -95,7 +96,56 @@ async function fetchSingleBlog(req, res, next) {
 
 async function updateBlog(req, res, next) {
 
+    const requiredData = matchedData(req, { includeOptionals: false }); // get the validated data from request
+    id = requiredData.blog_id
+    delete requiredData.blog_id // delete the blog_id key from the request
+
+    try {
+
+        const blog = await blogModel.findOneAndUpdate({ _id: id, author: req.body.auth.user._id }, { $set: requiredData }, { new: true }).populate({ path: 'authorDetails' })
+
+        if (!blog) {
+            err.type = 'Invallid ID';
+            return next(err)
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Blog Updated Sucessfully!!!",
+            data: { blod: blog }
+        });
+
+    } catch (err) {
+        err.type = 'No Data';
+        next(err)
+    }
 }
+
+async function delteBlog(req, res, next) {
+
+    const id = req.params.id;
+
+    try {
+
+        const blog = await blogModel.findOneAndDelete({ _id: id, author: req.body.auth.user._id })
+
+        if (!blog) {
+            err.type = 'Invallid ID';
+            return next(err)
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Blog Deleted Sucessfully!!!",
+            data: { blod: blog }
+        });
+
+    } catch (err) {
+        err.type = 'No Data';
+        next(err)
+    }
+}
+
 
 function authenticate(req, res, next) {
     console.log('i am here')
@@ -106,5 +156,6 @@ module.exports = {
     create,
     fetchAllBlog,
     updateBlog,
+    delteBlog,
     fetchSingleBlog
 }

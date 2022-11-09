@@ -19,7 +19,7 @@ app.use(bodyParser.json()) /**parse requests of content-type - application/json*
 
 // define a simple route
 app.get('/', (req, res) => {
-    res.json({ "message": "Welcome to EasyNotes application. Take notes quickly. Organize and keep track of all your notes." });
+    res.json({ "message": "This is the landing page of blog API" });
 });
 
 // public route

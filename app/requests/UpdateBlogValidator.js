@@ -1,7 +1,14 @@
 const { check, oneOf, validationResult } = require("express-validator");
 
 exports.update = [
-    check('author').exists().optional({ checkFalsy: true }).escape(),
+    check("blog_id", 'blog_id is required to edit a blog')
+    .not()
+    .isEmpty()
+    .trim()
+    .escape()
+    .withMessage("blog_id must have more than 3 characters"),
+    check('body').exists().optional({ checkFalsy: true }).escape(),
+    check('description').exists().optional({ checkFalsy: true }).escape(),
     check('title').exists().optional({ checkFalsy: true }).escape(),
     check('tags').exists().optional({ checkFalsy: true }).escape(),
     check('state').exists().isIn(['published', 'draft'])
