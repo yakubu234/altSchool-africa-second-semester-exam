@@ -28,14 +28,18 @@ function create(req, res, next) {
 
 }
 
-async function fetchAll(req, res, next) {
-
+async function fetchAllBlog(req, res, next) {
+    let search = {}
     const { page = 1, limit = 2 } = req.query; // destructure page and limit and set default values
     const skip = (page - 1) * limit;
+
+    if (req.query.state) search.state = req.query.state
+    search.id = req.body.auth.user._id
+
     try {
 
-        const blogs = await blogModel.find({}).populate({ path: 'authorDetails' }) // execute query with page and limit values
-            .limit(limit * 1)
+        const blogs = await blogModel.find(search).populate({ path: 'authorDetails' }).sort({ read_count: 1, reading_time: 1, timestamp: 1 })
+            .limit(limit * 1) // execute query with page and limit values
             .skip(skip)
             .exec();
 
@@ -65,7 +69,7 @@ async function fetchSingleBlog(req, res, next) {
 
     try {
 
-        const blogs = await blogModel.find({}).populate({ path: 'authorDetails' })
+        const blogs = await blogModel.find({}).populate({ path: 'authorDetails' }).sort({ read_count: 1, reading_time: 1, timestamp: 1 })
 
         if (skip > count || !blogs) {
             err.type = 'Invallid Page';
@@ -89,16 +93,6 @@ async function fetchSingleBlog(req, res, next) {
 
 }
 
-async function updateBlog(req, res, next) {
-
-}
-
-async function listBlog(req, res, next) {
-    return res.json(req.body.auth.user._id)
-}
-
-
-
 function authenticate(req, res, next) {
     console.log('i am here')
     return
@@ -106,8 +100,7 @@ function authenticate(req, res, next) {
 
 module.exports = {
     create,
-    fetchAll,
+    fetchAllBlog,
     updateBlog,
-    listBlog,
     fetchSingleBlog
 }

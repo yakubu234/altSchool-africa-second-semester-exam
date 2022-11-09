@@ -5,7 +5,7 @@ const UserRoutes = require('./routes/UserRoute');
 const bodyParser = require('body-parser');
 const errorHandler = require('./app/middleware/ErrorHandler')
 const mongoose = require('./config/database.config.js');
-const PORT = 5000;
+const PORT = process.env.APP_PORT;
 const JWT_SECRETE = process.env.JWT_SECRETE;
 
 
