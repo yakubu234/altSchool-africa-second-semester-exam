@@ -93,6 +93,10 @@ async function fetchSingleBlog(req, res, next) {
 
 }
 
+async function updateBlog(req, res, next) {
+
+}
+
 function authenticate(req, res, next) {
     console.log('i am here')
     return
